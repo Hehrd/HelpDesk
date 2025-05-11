@@ -8,7 +8,7 @@ async def get_threads():
     return JSONResponse(status_code=200)
 
 @thread_router.get("/threads/{id}")
-async def get_threads():
+async def get_thread():
     return JSONResponse(status_code=200)
 
 @thread_router.post("/threads")
