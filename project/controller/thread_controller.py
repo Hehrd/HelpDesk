@@ -1,8 +1,9 @@
 from typing import Optional
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Cookie
 from starlette.responses import JSONResponse
 
+from project.dtos import ThreadRequestDTO
 from project.service.thread_service import ThreadService
 from project.util.obj_mapper import to_thread_response_dto
 
@@ -19,13 +20,15 @@ def get_threads(page: int = Query(0, ge=0, description="Page number"),
 
 @thread_router.get("/threads/{id}")
 def get_thread():
-    thread_dto = thread_service.get_thread_by_id(id)
+    thread_dto = thread_service.get_thread_by_id(thread_id=id)
     return JSONResponse(thread_dto.as_dict(), status_code=200)
 
 @thread_router.post("/threads")
-def post_thread():
-    return JSONResponse(status_code=201)
+def post_thread(thread_dto: ThreadRequestDTO, jwt: str = Cookie(...)):
+    thread_service.create_thread(thread_dto=thread_dto, jwt=jwt)
+    return JSONResponse(thread_dto.as_dict(), status_code=201)
 
 @thread_router.delete("/threads/{id}")
-def delete_thread():
-    return JSONResponse(status_code=204)
+def delete_thread(id: int, jwt: str = Cookie(...)):
+    thread_service.delete_thread_by_id(thread_id=id, jwt=jwt)
+    return JSONResponse(status_code=204, content=None)

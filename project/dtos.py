@@ -53,6 +53,17 @@ class ThreadResponseDTO:
     description: str
     date_created: datetime
     bugs_ids: list[int]
+    creator_id: int
+
+    def as_dict(self):
+        return asdict(self)
+
+@dataclass
+class ThreadRequestDTO():
+    creator_id: Optional[int]
+    title: str
+    description: str
+    date_created: Optional[datetime]
 
     def as_dict(self):
         return asdict(self)
