@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass, asdict
 from datetime import datetime
 from typing import Optional
@@ -7,7 +8,6 @@ from pydantic import BaseModel
 from project.models import LogLevels
 
 
-@dataclass
 class SignUpUserDTO(BaseModel):
     first_name: str
     last_name: str
@@ -15,18 +15,16 @@ class SignUpUserDTO(BaseModel):
     password: str
 
     def as_dict(self):
-        return asdict(self)
+        return json.loads(self.json())
 
-@dataclass
-class LoginUserDTO:
+class LoginUserDTO(BaseModel):
     email: str
     password: str
 
     def as_dict(self):
-        return asdict(self)
+        return json.loads(self.json())
 
-@dataclass
-class LogResponseDTO:
+class LogResponseDTO(BaseModel):
     id: int
     type:LogLevels
     file_name: str
@@ -34,20 +32,18 @@ class LogResponseDTO:
     bugs_ids: list[int]
 
     def as_dict(self):
-        return asdict(self)
+        return json.loads(self.json())
 
-@dataclass
-class BugResponseDTO:
+class BugResponseDTO(BaseModel):
     id: int
     title: str
     log_ids: list[int]
     thread_id: int
 
     def as_dict(self):
-        return asdict(self)
+        return json.loads(self.json())
 
-@dataclass
-class ThreadResponseDTO:
+class ThreadResponseDTO(BaseModel):
     id: int
     title: str
     description: str
@@ -56,14 +52,21 @@ class ThreadResponseDTO:
     creator_id: int
 
     def as_dict(self):
-        return asdict(self)
+        return json.loads(self.json())
 
-@dataclass
-class ThreadRequestDTO():
-    creator_id: Optional[int]
+class ThreadRequestDTO(BaseModel):
+    creator_id: Optional[int] = None
     title: str
     description: str
-    date_created: Optional[datetime]
+    date_created: Optional[datetime] = None
 
     def as_dict(self):
-        return asdict(self)
+        return json.loads(self.json())
+
+class BugRequestDTO(BaseModel):
+    creator_id: Optional[int] = None
+    title: str
+    thread_id: int
+
+    def as_dict(self):
+        return json.loads(self.json())
