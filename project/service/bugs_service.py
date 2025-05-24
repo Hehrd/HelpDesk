@@ -1,12 +1,12 @@
 from project.db import SessionLocal
-from project.dtos import BugRequestDTO
-from project.models import BugEntity, ThreadEntity, UserEntity
+from project.dtos import BugRequestDTO, LogResponseDTO, LogRequestDTO
+from project.models import BugEntity, ThreadEntity, UserEntity, LogEntity
 from project.util.jwt import verify_jwt
-from project.util.obj_mapper import to_bug_response_dto, to_bug_entity
+from project.util.obj_mapper import to_bug_response_dto, to_bug_entity, to_log_response_dto
 
 
 class BugsService:
-    def get_bugs_by_thread_id(thread_id: int, page: int, size: int, offset: int):
+    def get_bugs_by_thread_id(self, thread_id: int, page: int, size: int, offset: int):
         session = SessionLocal()
         query = session.query(BugEntity).filter(BugEntity.thread_id == thread_id)
         if offset is not None:
@@ -17,13 +17,14 @@ class BugsService:
         session.close()
         return bug_dtos
 
-    def get_bug_by_id(bug_id: int, jwt: str):
+    def get_bug_by_id(self, id: int, jwt: str):
         session = SessionLocal()
         bug_entity = session.query(BugEntity).filter(BugEntity.id == id).first()
+        bug_dto = to_bug_response_dto(bug_entity)
         session.close()
-        return to_bug_response_dto(bug_entity)
+        return bug_dto
 
-    def create_bug(bug_dto: BugRequestDTO, jwt: str):
+    def create_bug(self, bug_dto: BugRequestDTO, jwt: str):
         session = SessionLocal()
         user_id = int(verify_jwt(jwt))
         bug_dto.creator_id = user_id
@@ -35,9 +36,26 @@ class BugsService:
         session.refresh(bug_entity)
         session.close()
 
-    def delete_bug_by_id(bug_id: int):
+    def delete_bug_by_id(self, id: int, jwt: str):
+        user_id = verify_jwt(jwt)
         session = SessionLocal()
-        bug_entity = session.query(BugEntity).filter_by(id=bug_id).first()
-        session.delete(bug_entity)
-        session.commit()
+        print("Test")
+        bug_entity = session.query(BugEntity).filter(BugEntity.id == id, BugEntity.creator_id == user_id).first()
+        if bug_entity:
+            session.delete(bug_entity)
+            session.commit()
+
         session.close()
+
+    def add_log(self, id: int, log_request_dto: LogRequestDTO, jwt: str):
+        session = SessionLocal()
+        bug = session.query(BugEntity).filter(BugEntity.id == id).first()
+        log_entity = session.query(LogEntity).filter(LogEntity.id == log_request_dto.id).first()
+        bug.logs.append(log_entity)
+        session.commit()
+        log_response_dto = to_log_response_dto(log_entity)
+        session.close()
+        return log_response_dto
+
+
+
