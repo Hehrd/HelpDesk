@@ -27,9 +27,9 @@ def get_bug_by_id(id: int, jwt: str = Cookie(...)):
     return JSONResponse(content=bug_dto.as_dict(), status_code=200)
 
 @bugs_router.post("/bugs")
-def post_bug(bug_dto: BugRequestDTO, jwt: str = Cookie(...)):
-    bugs_service.create_bug(bug_dto=bug_dto, jwt=jwt)
-    return JSONResponse(content=bug_dto.as_dict(), status_code=201)
+def post_bug(bug_request_dto: BugRequestDTO, jwt: str = Cookie(...)):
+    bug_response_dto = bugs_service.create_bug(bug_request_dto=bug_request_dto, jwt=jwt)
+    return JSONResponse(content=bug_response_dto.as_dict(), status_code=201)
 
 @bugs_router.delete("/bugs/{id}")
 def delete_bug(id: int, jwt: str = Cookie(...)):
