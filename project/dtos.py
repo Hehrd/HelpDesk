@@ -54,7 +54,18 @@ class ThreadResponseDTO(BaseModel):
     def as_dict(self):
         return json.loads(self.json())
 
-class ThreadRequestDTO(BaseModel):
+class CommentResponseDTO(BaseModel):
+    id: int
+    text: str
+    date_created: datetime
+    is_edited: bool
+    creator_id: int
+    bug_id: int
+
+    def as_dict(self):
+        return json.loads(self.json())
+
+class ThreadCreateRequestDTO(BaseModel):
     creator_id: Optional[int] = None
     title: str
     description: str
@@ -63,10 +74,31 @@ class ThreadRequestDTO(BaseModel):
     def as_dict(self):
         return json.loads(self.json())
 
-class BugRequestDTO(BaseModel):
+class BugCreateRequestDTO(BaseModel):
     creator_id: Optional[int] = None
     title: str
     thread_id: int
+
+    def as_dict(self):
+        return json.loads(self.json())
+
+class LogAddToBugRequestDTO(BaseModel):
+    id: int
+    def as_dict(self):
+        return json.loads(self.json())
+
+class CommentCreateRequestDTO(BaseModel):
+    creator_id: Optional[int] = None
+    text: str
+    date_created: Optional[datetime] = None
+    bug_id: int
+
+    def as_dict(self):
+        return json.loads(self.json())
+
+class CommentEditRequestDTO(BaseModel):
+    text: str
+    date_created: Optional[datetime] = None
 
     def as_dict(self):
         return json.loads(self.json())
