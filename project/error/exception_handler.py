@@ -1,6 +1,7 @@
 from starlette.responses import JSONResponse
 
 from project.error.bug_not_found_exception import BugNotFoundException
+from project.error.comment_not_found_exception import CommentNotFoundException
 from project.error.email_already_in_use_exception import EmailAlreadyInUseException
 from project.error.email_not_in_organization_exception import EmailNotInOrganizationException
 from project.error.insufficient_data_exception import InsufficientDataException
@@ -58,4 +59,8 @@ def register_error_handler(app: FastAPI):
 
     @app.exception_handler(LogNotFoundException)
     def log_not_found(request: Request, exc: LogNotFoundException):
+        return JSONResponse(status_code=404, content={"message": exc.msg})
+
+    @app.exception_handler(CommentNotFoundException)
+    def comment_not_found(request: Request, exc: CommentNotFoundException):
         return JSONResponse(status_code=404, content={"message": exc.msg})

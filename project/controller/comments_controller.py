@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Cookie
 from starlette.responses import JSONResponse
 
-from project.dtos import CommentCreateRequestDTO
+from project.dtos import CommentCreateRequestDTO, CommentEditRequestDTO
 from project.service.comments_service import CommentsService
 
 comments_router = APIRouter()
@@ -23,7 +23,7 @@ def delete_comment(id: int, jwt: str = Cookie(...)):
     return JSONResponse(content=None, status_code=204)
 
 @comments_router.patch("/{id}")
-def edit_comment(id: int, comment_edit_request_dto: CommentCreateRequestDTO, jwt: str = Cookie(...)):
+def edit_comment(id: int, comment_edit_request_dto: CommentEditRequestDTO, jwt: str = Cookie(...)):
     comment_response_dto = comments_service.edit_comment(comment_edit_request_dto=comment_edit_request_dto,
                                                          id=id,
                                                          jwt=jwt)
