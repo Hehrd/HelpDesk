@@ -116,3 +116,10 @@ class BugEditRequestDTO(BaseModel):
 
     def as_dict(self):
         return json.loads(self.json())
+
+class ThreadEditRequestDTO(BaseModel):
+    title: str
+    description: str
+
+    def as_dict(self):
+        return json.loads(self.json())

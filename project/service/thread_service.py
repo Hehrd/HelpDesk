@@ -2,7 +2,7 @@ from datetime import datetime
 from time import timezone
 
 from project.db import SessionLocal
-from project.dtos import ThreadRequestDTO, BugRequestDTO
+from project.dtos import ThreadCreateRequestDTO, BugCreateRequestDTO, ThreadEditRequestDTO
 from project.error.user_is_not_thread_creator_exception import UserIsNotThreadCreatorException
 from project.models import ThreadEntity
 from project.util.jwt import verify_jwt
@@ -29,12 +29,13 @@ class ThreadService:
     def get_thread_by_id(self, thread_id: int):
         session = SessionLocal()
         thread_entity = session.query(ThreadEntity).filter(ThreadEntity.id == thread_id).first()
+        validate_thread(thread_entity)
         thread_response_dto = to_thread_response_dto(thread_entity)
         session.close()
         validate_thread(thread_response_dto)
         return thread_response_dto
 
-    def create_thread(self, thread_request_dto: ThreadRequestDTO, jwt: str):
+    def create_thread(self, thread_request_dto: ThreadCreateRequestDTO, jwt: str):
         creator_id = verify_jwt(jwt)
         validate_thread_request_dto(thread_request_dto=thread_request_dto)
         thread_request_dto.creator_id = creator_id
@@ -57,4 +58,16 @@ class ThreadService:
         session.delete(thread)
         session.commit()
         session.close()
+
+    def edit_thread(self, id: int, thread_edit_request_dto: ThreadEditRequestDTO, jwt: str):
+        user_id = verify_jwt(jwt)
+        session = SessionLocal()
+        thread_entity = session.query(ThreadEntity).filter(ThreadEntity.id == id, ThreadEntity.creator_id == user_id).first()
+        validate_thread(thread_entity)
+        thread_entity.title = thread_edit_request_dto.title
+        thread_entity.description = thread_edit_request_dto.description
+        session.commit()
+        thread_response_dto = to_thread_response_dto(thread_entity)
+        session.close()
+        return thread_response_dto
 
