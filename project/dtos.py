@@ -24,6 +24,14 @@ class LoginUserDTO(BaseModel):
     def as_dict(self):
         return json.loads(self.json())
 
+class UserResponseDTO(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+
+    def as_dict(self):
+        return json.loads(self.json())
+
 class LogResponseDTO(BaseModel):
     id: int
     type:LogLevels
@@ -99,6 +107,12 @@ class CommentCreateRequestDTO(BaseModel):
 class CommentEditRequestDTO(BaseModel):
     text: str
     date_created: Optional[datetime] = None
+
+    def as_dict(self):
+        return json.loads(self.json())
+
+class BugEditRequestDTO(BaseModel):
+    title: str
 
     def as_dict(self):
         return json.loads(self.json())

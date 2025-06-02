@@ -1,7 +1,7 @@
 from xml.dom.minidom import Entity
 
 from project.dtos import SignUpUserDTO, LogResponseDTO, ThreadResponseDTO, ThreadCreateRequestDTO, BugResponseDTO, \
-    BugCreateRequestDTO, CommentResponseDTO, CommentCreateRequestDTO
+    BugCreateRequestDTO, CommentResponseDTO, CommentCreateRequestDTO, UserResponseDTO
 from project.models import UserEntity, LogEntity, ThreadEntity, BugEntity, CommentEntity
 
 
@@ -69,3 +69,9 @@ def to_comment_response_dto(entity: CommentEntity):
                                               bug_id=entity.bug_id,
                                               is_edited=entity.is_edited)
     return comment_response_dto
+
+def to_user_response_dto(entity: UserEntity):
+    user_response_dto = UserResponseDTO(first_name=entity.first_name,
+                                        last_name=entity.last_name,
+                                        email=entity.email)
+    return user_response_dto
