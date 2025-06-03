@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, Cookie, Query
 from starlette.responses import JSONResponse
 
-from project.dtos import BugCreateRequestDTO, LogAddToBugRequestDTO, BugEditRequestDTO
+from project.dtos import BugCreateRequestDTO, LogAddToBugRequestDTO, BugEditRequestDTO, LogRemoveFromBugRequestDTO
 from project.service.bugs_service import BugsService
 
 bugs_router = APIRouter()
@@ -45,3 +45,8 @@ def add_log(id: int, log_request_dto: LogAddToBugRequestDTO, jwt: str = Cookie(.
 def edit_bug(id: int, bug_edit_request_dto: BugEditRequestDTO, jwt: str = Cookie(...)):
     bug_response_dto = bugs_service.edit_bug_by_id(id=id, bug_edit_request_dto=bug_edit_request_dto, jwt=jwt)
     return JSONResponse(content=bug_response_dto.as_dict(), status_code=200)
+
+@bugs_router.delete("/logs/{id}")
+def remove_log(id: int, log_remove_request_dto: LogRemoveFromBugRequestDTO, jwt: str = Cookie(...)):
+    log_response_dto = bugs_service.remove_log_from_bug(id=id, log_request_dto=log_remove_request_dto, jwt=jwt)
+    return JSONResponse(content=None, status_code=204)

@@ -95,6 +95,12 @@ class LogAddToBugRequestDTO(BaseModel):
     def as_dict(self):
         return json.loads(self.json())
 
+class LogRemoveFromBugRequestDTO(BaseModel):
+    id: int
+
+    def as_dict(self):
+        return json.loads(self.json())
+
 class CommentCreateRequestDTO(BaseModel):
     creator_id: Optional[int] = None
     text: str
@@ -123,3 +129,5 @@ class ThreadEditRequestDTO(BaseModel):
 
     def as_dict(self):
         return json.loads(self.json())
+
+

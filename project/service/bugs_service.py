@@ -1,5 +1,7 @@
 from project.db import SessionLocal
-from project.dtos import BugRequestDTO, LogResponseDTO, LogRequestDTO
+from project.dtos import BugCreateRequestDTO, LogResponseDTO, LogAddToBugRequestDTO, BugEditRequestDTO, \
+    LogRemoveFromBugRequestDTO
+from project.error.log_not_found_exception import LogNotFoundException
 from project.models import BugEntity, ThreadEntity, UserEntity, LogEntity
 from project.util.jwt import verify_jwt
 from project.util.obj_mapper import to_bug_response_dto, to_bug_entity, to_log_response_dto
@@ -28,7 +30,7 @@ class BugsService:
         session.close()
         return bug_dto
 
-    def create_bug(self, bug_request_dto: BugRequestDTO, jwt: str):
+    def create_bug(self, bug_request_dto: BugCreateRequestDTO, jwt: str):
         session = SessionLocal()
         user_id = int(verify_jwt(jwt))
         bug_request_dto.creator_id = user_id
@@ -52,7 +54,7 @@ class BugsService:
 
         session.close()
 
-    def add_log(self, id: int, log_request_dto: LogRequestDTO, jwt: str):
+    def add_log(self, id: int, log_request_dto: LogAddToBugRequestDTO, jwt: str):
         session = SessionLocal()
         bug_entity = session.query(BugEntity).filter(BugEntity.id == id).first()
         log_entity = session.query(LogEntity).filter(LogEntity.id == log_request_dto.id).first()
@@ -63,6 +65,34 @@ class BugsService:
         log_response_dto = to_log_response_dto(log_entity)
         session.close()
         return log_response_dto
+
+    def edit_bug_by_id(self, id: int, bug_edit_request_dto: BugEditRequestDTO, jwt: str):
+        user_id = verify_jwt(jwt)
+        session = SessionLocal()
+        bug_entity = session.query(BugEntity).filter(BugEntity.id == id, BugEntity.creator_id == user_id).first()
+        validate_bug(bug_entity)
+        bug_entity.title = bug_edit_request_dto.title
+        session.commit()
+        bug_response_dto = to_bug_response_dto(bug_entity)
+        session.close()
+        return bug_response_dto
+
+    def remove_log_from_bug(self, id: int, log_request_dto: LogRemoveFromBugRequestDTO, jwt: str):
+        user_id = verify_jwt(jwt)
+        session = SessionLocal()
+        bug_entity = session.query(BugEntity).filter(BugEntity.id == id, BugEntity.creator_id == user_id).first()
+        validate_bug(bug_entity)
+        for log_entity in bug_entity.logs:
+            if log_entity.id == log_request_dto.id:
+                bug_entity.logs.remove(log_entity)
+                session.commit()
+                log_response_dto = to_log_response_dto(log_entity)
+                session.close()
+                return log_response_dto
+
+        raise LogNotFoundException("Log not found!")
+
+
 
 
 
