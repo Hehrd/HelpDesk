@@ -50,11 +50,10 @@ class ThreadService:
         return thread_response_dto
 
     def delete_thread_by_id(self, thread_id: int, jwt: str):
-        session = SessionLocal()
-        thread = session.query(ThreadEntity).filter_by(id=thread_id).first()
         user_id = int(verify_jwt(jwt))
-        validate_thread_request_dto(thread)
-        validate_thread_creator(thread_creator_id=thread.creator_id, user_id=user_id)
+        session = SessionLocal()
+        thread = session.query(ThreadEntity).filter(ThreadEntity.id == thread_id, ThreadEntity.creator_id == user_id).first()
+        validate_thread(thread)
         session.delete(thread)
         session.commit()
         session.close()
